@@ -10,11 +10,12 @@ use crate::{
 };
 use configparser::ini::Ini;
 use data_encoding::BASE64URL_NOPAD;
+use indexmap::IndexMap;
 use rattler_digest::Sha256;
 use std::str::FromStr;
 use std::{
     borrow::Cow,
-    collections::{HashMap, HashSet},
+    collections::HashSet,
     ffi::OsStr,
     fs,
     io::{BufRead, BufReader, Read, Write},
@@ -624,13 +625,13 @@ impl Scripts {
 
         // Parse the script entry points
         let console_scripts = entry_points_mapping
-            .remove("console_scripts")
+            .shift_remove("console_scripts")
             .map(|e| parse_entry_points_from_ini_section(e, extras))
             .transpose()?
             .unwrap_or_default();
 
         let gui_scripts = entry_points_mapping
-            .remove("gui_scripts")
+            .shift_remove("gui_scripts")
             .map(|e| parse_entry_points_from_ini_section(e, extras))
             .transpose()?
             .unwrap_or_default();
@@ -669,7 +670,7 @@ impl Scripts {
 
 /// Parse entry points from a section in the `entry_points.txt` file.
 fn parse_entry_points_from_ini_section(
-    entry_points: HashMap<String, Option<String>>,
+    entry_points: IndexMap<String, Option<String>>,
     extras: Option<&HashSet<Extra>>,
 ) -> Result<Vec<EntryPoint>, InstallError> {
     let mut result = Vec::new();
